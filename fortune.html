@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Magadankor0lek - Бизнес Решения</title>
+    <style>
+        /* --- Основные настройки --- */
+        :root {
+            --primary-color: #334155;
+            --secondary-color: #475569;
+            --accent-color: #0ea5e9;
+            --accent-hover: #0284c7;
+            --bg-light: #f1f5f9;
+            --bg-gradient-start: #f8fafc;
+            --bg-gradient-end: #e2e8f0;
+            --white: #ffffff;
+            --text-color: #334155;
+            --transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent; /* Убирает синий фон при клике на мобилках */
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-color);
+            overflow: hidden; /* Важно для свайпов */
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+
+        /* --- Верхняя панель (Мобильное меню) --- */
+        .mobile-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary-color);
+            padding: 5px;
+        }
+
+        /* Выпадающее меню */
+        .mobile-nav-overlay {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 100%;
+            height: 0;
+            background: var(--white);
+            overflow: hidden;
+            transition: height 0.3s ease;
+            z-index: 999;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .mobile-nav-overlay.open {
+            height: 150px;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--bg-light);
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-item:active {
+            background-color: var(--bg-light);
+        }
+
+        /* --- Контейнер слайдера --- */
+        .slider-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            touch-action: pan-y; /* Разрешаем скролл по вертикали внутри элементов, но слайды меняем свайпом по X */
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            padding-top: 80px; /* Отступ для хедера */
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            z-index: 10;
+            animation: slideUpFade 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .slide.exit {
+            opacity: 0;
+            visibility: hidden;
+            z-index: 5;
+            animation: slideUpFadeOut 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(30px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes slideUpFadeOut {
+            from { opacity: 1; transform: translateY(0) scale(1); }
+            to { opacity: 0; transform: translateY(-30px) scale(1.02); }
+        }
+
+        /* --- Фоновые элементы (Уменьшены для мобильных) --- */
+        .floating-element {
+            position: absolute;
+            z-index: 1;
+            opacity: 0.5;
+            pointer-events: none;
+            filter: grayscale(30%) sepia(10%) hue-rotate(180deg) brightness(1.1);
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            box-shadow: 0 10px 30px rgba(51, 65, 85, 0.1);
+            animation: float 8s ease-in-out infinite;
+            object-fit: cover;
+        }
+
+        /* Позиции для мобильных: меньше размер, меньше мешают */
+        .float-1 { top: 5%; left: -10%; width: 150px; height: 150px; animation-delay: 0s; }
+        .float-2 { bottom: 5%; right: -10%; width: 120px; height: 120px; animation-delay: 2s; }
+        .float-3 { top: 15%; right: 5%; width: 80px; height: 80px; animation-delay: 4s; }
+        .float-4 { bottom: 15%; left: 5%; width: 100px; height: 100px; animation-delay: 1s; }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .slide.active .floating-element {
+            animation: flyIn 1s ease-out forwards, float 8s ease-in-out infinite 1s;
+        }
+
+        @keyframes flyIn {
+            from { opacity: 0; transform: translateY(50px) scale(0.5); }
+            to { opacity: 0.5; transform: translateY(0) scale(1); }
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 20;
+            width: 100%;
+            max-width: 100%; /* На мобилке на всю ширину */
+            padding: 0 10px;
+        }
+
+        /* --- Слайд 1: Вступление --- */
+        .hero-content {
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 2rem; /* Меньше для мобильных */
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+            color: var(--secondary-color);
+            font-weight: 300;
+        }
+
+        .decorative-line {
+            width: 60px;
+            height: 3px;
+            background-color: var(--accent-color);
+            margin: 20px auto;
+            border-radius: 2px;
+        }
+
+        /* --- Слайд 2: Опции --- */
+        .options-grid {
+            display: flex;
+            flex-direction: column; /* Вертикально на мобильных */
+            gap: 15px;
+            width: 100%;
+        }
+
+        .option-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(51, 65, 85, 0.05);
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            cursor: pointer;
+        }
+
+        .option-card:active {
+            transform: scale(0.98);
+        }
+
+        .option-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+
+        .option-title {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .option-card p {
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+        }
+
+        /* --- Слайд 3: Контакты --- */
+        .contact-container {
+            display: flex;
+            flex-direction: column; /* Вертикально */
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(51, 65, 85, 0.08);
+            overflow: hidden;
+            width: 100%;
+            height: auto; /* Автовысота */
+            max-height: 80vh;
+            overflow-y: auto; /* Скролл внутри формы */
+        }
+
+        .contact-form-wrapper {
+            padding: 30px 20px;
+            order: 2; /* Форма второй */
+        }
+
+        .contact-info-wrapper {
+            background-color: var(--primary-color);
+            color: #e2e8f0;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            order: 1; /* Инфо первой */
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.85rem; color: var(--secondary-color); }
+        .form-control {
+            width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px;
+            font-size: 1rem; transition: var(--transition); background-color: #f8fafc;
+            border-radius: 12px; /* Более скругленные для удобства нажатия */
+        }
+        .form-control:focus {
+            outline: none; border-color: var(--accent-color);
+            background-color: var(--white);
+        }
+        .btn-submit {
+            background-color: var(--accent-color); color: var(--white); border: none;
+            padding: 14px; border-radius: 12px; font-size: 1rem; font-weight: 600;
+            cursor: pointer; transition: var(--transition); width: 100%;
+        }
+        .btn-submit:active { background-color: var(--accent-hover); transform: scale(0.98); }
+
+        .creator-photo {
+            width: 100px; height: 100px; border-radius: 50%; object-fit: cover;
+            border: 3px solid rgba(255,255,255,0.2); margin-bottom: 15px;
+        }
+        .contact-detail { margin: 5px 0; font-size: 0.95rem; }
+
+        /* --- Навигация (Точки) --- */
+        .slider-nav {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 100; display: flex; gap: 10px;
+        }
+        .nav-dot {
+            width: 10px; height: 10px; background-color: rgba(51, 65, 85, 0.3);
+            border-radius: 50%; cursor: pointer; transition: var(--transition);
+        }
+        .nav-dot.active { background-color: var(--accent-color); transform: scale(1.2); }
+
+        /* Canvas для фейерверков */
+        #fireworksCanvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 15;
+        }
+
+        /* --- Десктопная версия (для больших экранов) --- */
+        @media (min-width: 769px) {
+            .mobile-header { display: none; } /* Скрываем мобильное меню */
+            .slide { padding-top: 20px; }
+            .content-wrapper { max-width: 1200px; padding: 0 20px; }
+            .hero-title { font-size: 3.5rem; }
+            .hero-subtitle { font-size: 1.5rem; }
+            .options-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); display: grid; }
+            .contact-container { flex-direction: row; max-height: 600px; height: 80vh; overflow: hidden; }
+            .contact-form-wrapper { order: 1; padding: 50px; }
+            .contact-info-wrapper { order: 2; padding: 50px; border-bottom: none; border-left: 1px solid rgba(255,255,255,0.1); }
+            .creator-photo { width: 150px; height: 150px; }
+            .float-1 { width: 300px; height: 300px; top: 10%; left: -5%; }
+            .float-2 { width: 250px; height: 250px; bottom: 10%; right: -5%; }
+            .float-3 { width: 150px; height: 150px; top: 20%; right: 15%; }
+            .float-4 { width: 200px; height: 200px; bottom: 20%; left: 10%; }
+            .floating-element { opacity: 0.6; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Мобильный хедер -->
+    <header class="mobile-header">
+        <div class="logo">Magadankor0lek</div>
+        <button class="menu-btn" id="menuBtn">☰</button>
+    </header>
+
+    <!-- Мобильное меню -->
+    <div class="mobile-nav-overlay" id="mobileNav">
+        <a href="#" class="nav-item" onclick="goToSlide(0); toggleMenu();">Главная</a>
+        <a href="#" class="nav-item" onclick="goToSlide(1); toggleMenu();">Услуги</a>
+        <a href="#" class="nav-item" onclick="goToSlide(2); toggleMenu();">Контакты</a>
+    </div>
+
+    <div class="slider-container" id="sliderContainer">
+        
+        <!-- Слайд 1: Вступление -->
+        <div class="slide active" id="slide1">
+            <img src="https://images.unsplash.com/photo-1614594975525-e45190c55d0b?q=80&w=400&auto=format&fit=crop" class="floating-element float-1" alt="Декор">
+            <img src="https://images.unsplash.com/photo-1545241047-6083a3684587?q=80&w=400&auto=format&fit=crop" class="floating-element float-2" alt="Декор">
+            
+            <div class="content-wrapper hero-content">
+                <div class="decorative-line"></div>
+                <h1 class="hero-title">Вас приветствует<br>Magadankor0lek</h1>
+                <p class="hero-subtitle">Ваш надежный партнер в мире цифровых решений</p>
+                <div class="decorative-line"></div>
+            </div>
+        </div>
+
+        <!-- Слайд 2: Опции -->
+        <div class="slide" id="slide2">
+            <canvas id="fireworksCanvas"></canvas>
+            <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=400&auto=format&fit=crop" class="floating-element float-3" alt="Декор">
+            <img src="https://images.unsplash.com/photo-1507643179173-617d6a7dd40d?q=80&w=400&auto=format&fit=crop" class="floating-element float-4" alt="Декор">
+
+            <div class="content-wrapper">
+                <div class="options-grid">
+                    <div class="option-card" data-color="#0ea5e9">
+                        <div class="option-icon">💻</div>
+                        <h3 class="option-title">Вебсайт</h3>
+                        <p>Разработка уникальных и современных веб-ресурсов.</p>
+                    </div>
+                    <div class="option-card" data-color="#38bdf8">
+                        <div class="option-icon">🚀</div>
+                        <h3 class="option-title">Продвижение</h3>
+                        <p>Маркетинг и SEO для вывода бизнеса в топ.</p>
+                    </div>
+                    <div class="option-card" data-color="#7dd3fc">
+                        <div class="option-icon">🤝</div>
+                        <h3 class="option-title">Консалтинг</h3>
+                        <p>Управление проектами для роста эффективности.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 3: Контакты -->
+        <div class="slide" id="slide3">
+            <img src="https://images.unsplash.com/photo-1596395819057-d899a4a2d8c4?q=80&w=400&auto=format&fit=crop" class="floating-element float-1" alt="Декор">
+            <img src="https://images.unsplash.com/photo-1605218427306-022ba6c22512?q=80&w=400&auto=format&fit=crop" class="floating-element float-2" alt="Декор">
+
+            <div class="content-wrapper">
+                <div class="contact-container">
+                    <div class="contact-form-wrapper">
+                        <h2 style="margin-bottom: 20px; color: var(--primary-color); font-size: 1.5rem;">Связаться</h2>
+                        <form onsubmit="event.preventDefault(); alert('Спасибо! Мы свяжемся с вами.');">
+                            <div class="form-group">
+                                <label>Имя</label>
+                                <input type="text" class="form-control" placeholder="Ваше имя" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" class="form-control" placeholder="email@example.com" required>
+                            </div>
+                            <button type="submit" class="btn-submit">Отправить</button>
+                        </form>
+                    </div>
+                    <div class="contact-info-wrapper">
+                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=400&auto=format&fit=crop" alt="Фото создателя" class="creator-photo">
+                        <h3>Magadankor0lek</h3>
+                        <p style="margin-bottom: 15px; opacity: 0.8; font-size: 0.9rem;">Lead Developer</p>
+                        <div class="contact-detail">📞 +7 (999) 000-00-00</div>
+                        <div class="contact-detail">✉️ contact@magadankor0lek.com</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Навигация -->
+        <div class="slider-nav">
+            <div class="nav-dot active" onclick="goToSlide(0)"></div>
+            <div class="nav-dot" onclick="goToSlide(1)"></div>
+            <div class="nav-dot" onclick="goToSlide(2)"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Логика слайдера и Свайпы ---
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.nav-dot');
+        const sliderContainer = document.getElementById('sliderContainer');
+        let currentSlide = 0;
+        let slideInterval;
+        let isAnimating = false;
+
+        // Функция переключения слайда
+        function showSlide(index) {
+            if (isAnimating || index === currentSlide) return;
+            isAnimating = true;
+
+            // Уходящий слайд
+            slides[currentSlide].classList.remove('active');
+            slides[currentSlide].classList.add('exit');
+
+            // Активный слайд
+            slides[index].classList.add('active');
+            dots.forEach(d => d.classList.remove('active'));
+            dots[index].classList.add('active');
+
+            // Очистка классов после анимации
+            setTimeout(() => {
+                slides[currentSlide].classList.remove('exit');
+                currentSlide = index;
+                isAnimating = false;
+            }, 600); // Время должно совпадать с CSS transition
+        }
+
+        function nextSlide() {
+            let next = (currentSlide + 1) % slides.length;
+            showSlide(next);
+        }
+
+        function prevSlide() {
+            let prev = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(prev);
+        }
+
+        function goToSlide(index) {
+            showSlide(index);
+            resetInterval();
+        }
+
+        function resetInterval() {
+            clearInterval(slideInterval);
+            slideInterval = setInterval(nextSlide, 6000);
+        }
+
+        // --- Обработка Свайпов (Touch Events) ---
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        sliderContainer.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, {passive: true});
+
+        sliderContainer.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, {passive: true});
+
+        function handleSwipe() {
+            const threshold = 50; // Минимальная длина свайпа
+            if (touchEndX < touchStartX - threshold) {
+                nextSlide(); // Свайп влево -> Следующий
+            }
+            if (touchEndX > touchStartX + threshold) {
+                prevSlide(); // Свайп вправо -> Предыдущий
+            }
+        }
+
+        // --- Мобильное меню ---
+        const menuBtn = document.getElementById('menuBtn');
+        const mobileNav = document.getElementById('mobileNav');
+
+        function toggleMenu() {
+            mobileNav.classList.toggle('open');
+            menuBtn.textContent = mobileNav.classList.contains('open') ? '✕' : '☰';
+        }
+
+        menuBtn.addEventListener('click', toggleMenu);
+
+        // --- Фейерверки (Адаптировано под Touch) ---
+        const canvas = document.getElementById('fireworksCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = Math.random() * 4 + 2;
+                this.vx = Math.cos(angle) * velocity;
+                this.vy = Math.sin(angle) * velocity;
+                this.alpha = 1;
+                this.decay = Math.random() * 0.02 + 0.015;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.05;
+                this.alpha -= this.decay;
+            }
+        }
+
+        function createFirework(x, y, color) {
+            for (let i = 0; i < 20; i++) { // Меньше частиц для мобильной производительности
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        function animateFireworks() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((particle, index) => {
+                if (particle.alpha > 0) {
+                    particle.update();
+                    particle.draw();
+                } else {
+                    particles.splice(index, 1);
+                }
+            });
+            requestAnimationFrame(animateFireworks);
+        }
+
+        animateFireworks();
+
+        // Запуск фейерверков при касании карточек
+        const cards = document.querySelectorAll('.option-card');
+        
+        // Объединяем события мыши и касания
+        const triggerFirework = (e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            // Определяем координаты в зависимости от типа события
+            let clientX, clientY;
+            if(e.type === 'touchstart') {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            const color = e.currentTarget.getAttribute('data-color');
+            
+            if (Math.random() > 0.85) { // Чуть реже для экономии батареи
+                createFirework(x, y, color);
+            }
+        };
+
+        cards.forEach(card => {
+            card.addEventListener('touchstart', triggerFirework, {passive: true});
+            card.addEventListener('mousemove', triggerFirework);
+        });
+
+        // Запуск автопрокрутки
+        resetInterval();
+
+    </script>
+</body>
+</html>
