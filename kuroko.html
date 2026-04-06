@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>黑子的篮球 - 奇迹世代与火神</title>
+    <title>Kuroko no Basuke - Character Profiles</title>
     <style>
-        /* --- 全局变量与重置 --- */
+        /* --- Global Variables & Reset --- */
         :root {
-            --c-red: #8E2323; /* 朱红 */
-            --c-gold: #C5A065; /* 琉璃金 */
-            --c-ink: #1A1A1A; /* 墨黑 */
-            --c-paper: #F4F1EA; /* 宣纸白 */
+            --c-red: #8E2323; /* Vermilion */
+            --c-gold: #C5A065; /* Gold */
+            --c-ink: #1A1A1A; /* Ink Black */
+            --c-paper: #F4F1EA; /* Rice Paper */
             --c-overlay: rgba(0, 0, 0, 0.6);
-            --font-serif: "Noto Serif SC", "SimSun", "Songti SC", serif;
+            --font-serif: "Noto Serif SC", "Georgia", "Times New Roman", serif;
             --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
         }
 
@@ -27,7 +27,7 @@
             font-family: var(--font-serif);
             background-color: var(--c-ink);
             color: var(--c-ink);
-            overflow: hidden; /* 防止滚动，使用幻灯片切换 */
+            overflow: hidden;
             height: 100vh;
             width: 100vw;
             display: flex;
@@ -35,24 +35,22 @@
             align-items: center;
         }
 
-        /* --- 背景水墨效果 --- */
+        /* --- Background Ink Effect --- */
         .bg-ink {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: 
-                radial-gradient(circle at 50% 30%, transparent 20%, #000 120%),
-                url('https://www.transparenttextures.com/patterns/black-paper.png'); /* 纸张纹理 */
+            background: radial-gradient(circle at 50% 30%, transparent 20%, #000 120%);
             z-index: -2;
-            opacity: 0.9;
+            opacity: 0.95;
         }
 
         .bg-circle {
             position: absolute;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(142, 35, 35, 0.2) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(142, 35, 35, 0.15) 0%, transparent 70%);
             z-index: -1;
             animation: breathe 8s infinite alternate;
         }
@@ -62,7 +60,7 @@
             100% { transform: scale(1.2); opacity: 0.8; }
         }
 
-        /* --- 幻灯片容器 --- */
+        /* --- Slider Container --- */
         .slider-container {
             width: 100%;
             height: 100%;
@@ -81,9 +79,8 @@
             transition: all 0.8s var(--ease-out);
             display: flex;
             flex-direction: column;
-            padding: 20px;
+            padding: 15px;
             background: var(--c-paper);
-            /* 装饰性边框 */
             border: 2px solid var(--c-gold);
             box-shadow: inset 0 0 50px rgba(0,0,0,0.1);
         }
@@ -92,6 +89,7 @@
             opacity: 1;
             visibility: visible;
             transform: scale(1);
+            z-index: 10;
         }
 
         .slide.prev {
@@ -104,105 +102,151 @@
             opacity: 0;
         }
 
-        /* --- 角色内容布局 --- */
+        /* --- Character Content Layout --- */
         .content-wrapper {
             flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-start;
             z-index: 2;
             height: 100%;
             position: relative;
+            padding-top: 10px;
         }
 
-        /* 标题区 */
+        /* Quote Section */
+        .quote-box {
+            text-align: center;
+            margin-bottom: 10px;
+            font-style: italic;
+            color: var(--c-red);
+            font-size: 0.9rem;
+            font-weight: bold;
+            padding: 0 10px;
+            border-top: 1px solid var(--c-gold);
+            border-bottom: 1px solid var(--c-gold);
+            background: rgba(255,255,255,0.4);
+            width: 90%;
+            padding: 8px 0;
+        }
+
+        /* Header Section */
         .header {
             text-align: center;
-            margin-top: 10px;
-            border-bottom: 1px solid var(--c-red);
-            padding-bottom: 10px;
-            width: 80%;
+            margin-bottom: 10px;
+            width: 100%;
         }
 
-        .name-cn {
-            font-size: 2.5rem;
+        .name-en {
+            font-size: 2rem;
             color: var(--c-red);
             font-weight: bold;
-            letter-spacing: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
             text-shadow: 1px 1px 0px rgba(0,0,0,0.2);
         }
 
         .name-jp {
             font-size: 1rem;
             color: var(--c-gold);
-            margin-top: 5px;
+            margin-top: 2px;
             font-style: italic;
         }
 
         .title {
-            font-size: 0.9rem;
-            color: #666;
+            font-size: 0.85rem;
+            color: #444;
             margin-top: 5px;
             font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        /* 图片区 */
+        /* Image Section */
         .character-visual {
             position: relative;
             width: 100%;
-            height: 45vh;
+            height: 38vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            margin-bottom: 10px;
         }
 
         .main-img {
-            width: auto;
             height: 100%;
-            max-width: 90%;
+            width: auto;
+            max-width: 100%;
             object-fit: contain;
             filter: drop-shadow(5px 5px 10px rgba(0,0,0,0.3));
             z-index: 10;
-            /* 默认漂浮动画 */
             animation: float 6s ease-in-out infinite;
         }
 
-        /* 漂浮的背景截图 */
+        /* Floating Screenshots */
         .floating-screenshot {
             position: absolute;
-            width: 120px;
-            height: 180px;
+            width: 100px;
+            height: 150px;
             object-fit: cover;
-            border: 3px solid var(--c-gold);
+            border: 2px solid var(--c-gold);
             border-radius: 4px;
             opacity: 0.8;
             box-shadow: 0 10px 20px rgba(0,0,0,0.2);
             z-index: 5;
-            filter: sepia(0.3) contrast(1.1);
+            filter: sepia(0.2) contrast(1.1);
         }
 
-        .fs-1 { top: 10%; left: 5%; animation: float 7s ease-in-out infinite 0.5s; }
-        .fs-2 { bottom: 10%; right: 5%; animation: float 8s ease-in-out infinite 1s; }
-        .fs-3 { top: 20%; right: 10%; width: 100px; height: 100px; border-radius: 50%; animation: float 9s ease-in-out infinite 1.5s; }
+        .fs-1 { top: 5%; left: 5%; animation: float 7s ease-in-out infinite 0.5s; }
+        .fs-2 { bottom: 5%; right: 5%; animation: float 8s ease-in-out infinite 1s; }
+        .fs-3 { top: 15%; right: 10%; width: 80px; height: 80px; border-radius: 50%; animation: float 9s ease-in-out infinite 1.5s; }
 
-        /* 描述区 */
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            width: 100%;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+            background: rgba(255,255,255,0.5);
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid rgba(197, 160, 101, 0.3);
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .stat-label {
+            color: #666;
+            font-weight: bold;
+        }
+
+        .stat-value {
+            color: var(--c-ink);
+        }
+
+        /* Description Section */
         .description {
             background: rgba(255, 255, 255, 0.8);
-            padding: 15px;
+            padding: 12px;
             border-radius: 4px;
             border-left: 4px solid var(--c-red);
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-bottom: 20px;
-            max-height: 25vh;
-            overflow-y: auto;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            flex-grow: 1;
             width: 100%;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             text-align: justify;
+            overflow-y: auto;
+            margin-bottom: 60px; /* Space for controls */
         }
 
-        /* --- 导航控制 --- */
+        /* --- Navigation Controls --- */
         .controls {
             position: absolute;
             bottom: 20px;
@@ -215,7 +259,7 @@
         }
 
         .nav-btn {
-            background: transparent;
+            background: var(--c-paper);
             border: 2px solid var(--c-red);
             color: var(--c-red);
             width: 40px;
@@ -228,6 +272,7 @@
             align-items: center;
             transition: all 0.3s;
             font-family: sans-serif;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
         .nav-btn:active {
@@ -254,13 +299,13 @@
             transform: scale(1.5);
         }
 
-        /* --- 动画关键帧 --- */
+        /* --- Animations --- */
         @keyframes float {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-15px); }
         }
 
-        /* --- 滚动条美化 --- */
+        /* Scrollbar styling */
         .description::-webkit-scrollbar {
             width: 4px;
         }
@@ -269,175 +314,207 @@
             border-radius: 2px;
         }
 
-        /* 响应式微调 */
         @media (min-width: 768px) {
             .slide {
-                max-width: 480px;
+                max-width: 450px;
                 height: 90vh;
                 border-radius: 10px;
                 margin: auto;
-            }
-            .bg-ink {
-                background-size: cover;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- 背景装饰 -->
+    <!-- Background Decoration -->
     <div class="bg-ink"></div>
     <div class="bg-circle" style="top: -10%; left: -10%; width: 300px; height: 300px;"></div>
     <div class="bg-circle" style="bottom: -10%; right: -10%; width: 400px; height: 400px;"></div>
 
     <div class="slider-container" id="slider">
         
-        <!-- Slide 1: 青峰大辉 -->
+        <!-- Slide 1: Aomine -->
         <div class="slide active">
             <div class="content-wrapper">
+                <div class="quote-box">"The only one who can beat me is me."</div>
                 <div class="header">
-                    <div class="name-cn">青峰大辉</div>
-                    <div class="name-jp">Aomine Daiki</div>
-                    <div class="title">原奇迹世代 · 不完全的杰作</div>
+                    <div class="name-en">Daiki Aomine</div>
+                    <div class="name-jp">青峰 大輝</div>
+                    <div class="title">The Ace of Generation of Miracles</div>
                 </div>
                 <div class="character-visual">
-                    <!-- 漂浮的背景截图 -->
-                    <img src="https://picsum.photos/seed/aomine1/200/300" class="floating-screenshot fs-1" alt="scene">
-                    <img src="https://picsum.photos/seed/aomine2/200/300" class="floating-screenshot fs-2" alt="scene">
-                    <!-- 主图 -->
-                    <img src="https://picsum.photos/seed/aomine_main/400/600" class="main-img" alt="青峰大辉">
+                    <img src="https://static.wikia.nocookie.net/kurokonobasuke/images/5/5e/Daiki_Aomine_Profile.png" class="main-img" alt="Daiki Aomine">
+                    <img src="https://static.wikia.nocookie.net/kurokonobasuke/images/0/0c/Aomine_Anime.png" class="floating-screenshot fs-1" alt="Aomine Action">
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item"><span class="stat-label">Height:</span> <span class="stat-value">192 cm</span></div>
+                    <div class="stat-item"><span class="stat-label">Weight:</span> <span class="stat-value">85 kg</span></div>
+                    <div class="stat-item"><span class="stat-label">Birthday:</span> <span class="stat-value">Aug 31</span></div>
+                    <div class="stat-item"><span class="stat-label">Team:</span> <span class="stat-value">Tōō</span></div>
                 </div>
                 <div class="description">
-                    <p>“我是最强的。”</p>
-                    <p>拥有超越常理的身体素质和篮球天赋。曾经是黑子的光，后来因为过于强大而失去了对篮球的热情。他的打球风格自由奔放，无法被预测。只有遇到更强的对手，他才会真正觉醒。</p>
+                    <p>Former ace of Teikō Middle School. He possesses abilities that surpass all other players. His style is formless and free, making him unpredictable. He lost his passion for basketball due to lack of competition until he met Kagami.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 2: 紫原敦 -->
+        <!-- Slide 2: Murasakibara -->
         <div class="slide">
             <div class="content-wrapper">
+                <div class="quote-box">"Sweets are justice. Basketball is just a club activity."</div>
                 <div class="header">
-                    <div class="name-cn">紫原敦</div>
-                    <div class="name-jp">Murasakibara Atsushi</div>
-                    <div class="title">原奇迹世代 · 破坏的铁锤</div>
+                    <div class="name-en">Atsushi Murasakibara</div>
+                    <div class="name-jp">紫原 敦</div>
+                    <div class="title">The Iron Heart of Generation of Miracles</div>
                 </div>
                 <div class="character-visual">
-                    <img src="https://picsum.photos/seed/mura1/200/300" class="floating-screenshot fs-1" alt="scene">
-                    <img src="https://picsum.photos/seed/mura2/200/300" class="floating-screenshot fs-3" alt="scene">
-                    <img src="https://picsum.photos/seed/mura_main/400/600" class="main-img" alt="紫原敦">
+                    <img src="https://static.wikia.nocookie.net/kurokonobasuke/images/4/4b/Atsushi_Murasakibara_Profile.png" class="main-img" alt="Atsushi Murasakibara">
+                    <img src="https://static.wikia.nocookie.net/kurokonobasuke/images/7/7b/Murasakibara_Anime.png" class="floating-screenshot fs-2" alt="Murasakibara Action">
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item"><span class="stat-label">Height:</span> <span class="stat-value">208 cm</span></div>
+                    <div class="stat-item"><span class="stat-label">Weight:</span> <span class="stat-value">99 kg</span></div>
+                    <div class="stat-item"><span class="stat-label">Birthday:</span> <span class="stat-value">Oct 9</span></div>
+                    <div class="stat-item"><span class="stat-label">Team:</span> <span class="stat-value">Yōsen</span></div>
                 </div>
                 <div class="description">
-                    <p>“因为讨厌打篮球……所以还是快点结束吧。”</p>
-                    <p>身高接近两米，拥有惊人的臂展和防守覆盖面积。虽然平时懒散爱吃零食，但一旦被激怒，破坏力堪比怪兽。他在内线的统治力是绝对的，能够轻松摧毁对手的进攻。</p>
+                    <p>Towering center with immense strength and defensive reach. Although he claims to hate basketball, he is a genius at it. He dominates the paint with his "Thor's Hammer" spike and is nearly unstoppable when serious.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 3: 黄濑凉太 -->
+        <!-- Slide 3: Kise -->
         <div class="slide">
             <div class="content-wrapper">
+                <div class="quote-box">"I'll show you that I can beat you, copying you or not!"</div>
                 <div class="header">
-                    <div class="name-cn">黄濑凉太</div>
-                    <div class="name-jp">Kise Ryōta</div>
-                    <div class="title">原奇迹世代 · 天才的模仿者</div>
+                    <div class="name-en">Ryōta Kise</div>
+                    <div class="name-jp">黄瀬 涼太</div>
+                    <div class="title">The Copycat of Generation of Miracles</div>
                 </div>
                 <div class="character-visual">
-                    <img src="https://picsum.photos/seed/kise1/200/300" class="floating-screenshot fs-2" alt="scene">
-                    <img src="https://picsum.photos/seed/kise_main/400/600" class="main-img" alt="黄濑凉太">
+                    <img src="https://static.wikia.nocookie.net/kurokonobasuke/images/0/03/Ryota_Kise_Profile.png" class="main-img" alt="Ryōta Kise">
+                    <img src="https://static.wikia.nocookie.net/kurokonobasuke/images/3/3e/Kise_Anime.png" class="floating-screenshot fs-3" alt="Kise Action">
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item"><span class="stat-label">Height:</span> <span class="stat-value">189 cm</span></div>
+                    <div class="stat-item"><span class="stat-label">Weight:</span> <span class="stat-value">77 kg</span></div>
+                    <div class="stat-item"><span class="stat-label">Birthday:</span> <span class="stat-value">Jun 18</span></div>
+                    <div class="stat-item"><span class="stat-label">Team:</span> <span class="stat-value">Kaijō</span></div>
                 </div>
                 <div class="description">
-                    <p>“不管是怎样的技能，只要我看过一次就能完美复制。”</p>
-                    <p>原本是模特，接触篮球时间虽短但进步神速。拥有“完美复制”的能力，不仅能模仿对手的招式，还能将其组合运用出更强的效果。对黑子有着特殊的执着。</p>
+                    <p>A popular model who started basketball late but mastered it instantly. His "Perfect Copy" allows him to mimic any move he sees, even those of the Generation of Miracles. He can combine moves to create even stronger techniques.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 4: 黑子哲也 -->
+        <!-- Slide 4: Kuroko -->
         <div class="slide">
             <div class="content-wrapper">
+                <div class="quote-box">"I am the shadow. The shadow becomes darker when the light is stronger."</div>
                 <div class="header">
-                    <div class="name-cn">黑子哲也</div>
-                    <div class="name-jp">Kuroko Tetsuya</div>
-                    <div class="title">幻之第六人 · 影子</div>
+                    <div class="name-en">Tetsuya Kuroko</div>
+                    <div class="name-jp">黒子 テツヤ</div>
+                    <div class="title">The Phantom Sixth Man</div>
                 </div>
                 <div class="character-visual">
-                    <img src="https://picsum.photos/seed/kuroko1/200/300" class="floating-screenshot fs-1" alt="scene">
-                    <img src="https://picsum.photos/seed/kuroko2/200/300" class="floating-screenshot fs-2" alt="scene">
-                    <img src="https://picsum.photos/seed/kuroko_main/400/600" class="main-img" alt="黑子哲也">
+                    <img src="https://static.wikia.nocookie.net/kurokonobasuke/images/6/61/Tetsuya_Kuroko_Profile.png" class="main-img" alt="Tetsuya Kuroko">
+                    <img src="https://static.wikia.nocookie.net/kurokonobasuke/images/0/0c/Kuroko_Anime.png" class="floating-screenshot fs-1" alt="Kuroko Action">
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item"><span class="stat-label">Height:</span> <span class="stat-value">168 cm</span></div>
+                    <div class="stat-item"><span class="stat-label">Weight:</span> <span class="stat-value">57 kg</span></div>
+                    <div class="stat-item"><span class="stat-label">Birthday:</span> <span class="stat-value">Jan 31</span></div>
+                    <div class="stat-item"><span class="stat-label">Team:</span> <span class="stat-value">Seirin</span></div>
                 </div>
                 <div class="description">
-                    <p>“我是影子，影子越淡，光就越强。”</p>
-                    <p>存在感稀薄到让人经常忽略他的存在。利用视线诱导（Misdirection）在球场上神出鬼没地传球。虽然身体素质普通，但为了胜利有着比任何人都坚韧的意志。</p>
+                    <p>Lack of presence allows him to act as a "shadow," passing the ball unnoticed to his "light." He specializes in misdirection and passing. Though physically weak, his determination to make his team win is unmatched.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 5: 赤司征十郎 -->
+        <!-- Slide 5: Akashi -->
         <div class="slide">
             <div class="content-wrapper">
+                <div class="quote-box">"I am absolute. Victory is everything."</div>
                 <div class="header">
-                    <div class="name-cn">赤司征十郎</div>
-                    <div class="name-jp">Akashi Seijūrō</div>
-                    <div class="title">原奇迹世代 · 天帝之眼</div>
+                    <div class="name-en">Seijūrō Akashi</div>
+                    <div class="name-jp">赤司 征十郎</div>
+                    <div class="title">The Emperor of Generation of Miracles</div>
                 </div>
                 <div class="character-visual">
-                    <img src="https://picsum.photos/seed/akashi1/200/300" class="floating-screenshot fs-3" alt="scene">
-                    <img src="https://picsum.photos/seed/akashi_main/400/600" class="main-img" alt="赤司征十郎">
+                    <img src="https://static.wikia.nocookie.net/kurokonobasuke/images/e/e6/Seijuro_Akashi_Profile.png" class="main-img" alt="Seijūrō Akashi">
+                    <img src="https://static.wikia.nocookie.net/kurokonobasuke/images/9/9e/Akashi_Anime.png" class="floating-screenshot fs-2" alt="Akashi Action">
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item"><span class="stat-label">Height:</span> <span class="stat-value">173 cm</span></div>
+                    <div class="stat-item"><span class="stat-label">Weight:</span> <span class="stat-value">64 kg</span></div>
+                    <div class="stat-item"><span class="stat-label">Birthday:</span> <span class="stat-value">Dec 20</span></div>
+                    <div class="stat-item"><span class="stat-label">Team:</span> <span class="stat-value">Rakuzan</span></div>
                 </div>
                 <div class="description">
-                    <p>“胜利就是一切，败者没有任何价值。”</p>
-                    <p>奇迹世代的队长，拥有统御力和广阔的视野。他的“天帝之眼”能看穿对手的一切动作。在经历变故后，性格变得更加冷酷绝对，是所有人中最强的存在。</p>
+                    <p>The former captain of Teikō and Rakuzan. Possesses the "Emperor Eye" which allows him to see future movements. He is a master tactician and ball handler. His absolute confidence leads him to believe he cannot lose.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 6: 绿间真太郎 -->
+        <!-- Slide 6: Midorima -->
         <div class="slide">
             <div class="content-wrapper">
+                <div class="quote-box">"Man proposes, God disposes. But I trust my horoscope."</div>
                 <div class="header">
-                    <div class="name-cn">绿间真太郎</div>
-                    <div class="name-jp">Midorima Shintarō</div>
-                    <div class="title">原奇迹世代 · 全能射手</div>
+                    <div class="name-en">Shintarō Midorima</div>
+                    <div class="name-jp">緑間 真太郎</div>
+                    <div class="title">The Shooter of Generation of Miracles</div>
                 </div>
                 <div class="character-visual">
-                    <img src="https://picsum.photos/seed/mido1/200/300" class="floating-screenshot fs-1" alt="scene">
-                    <img src="https://picsum.photos/seed/mido_main/400/600" class="main-img" alt="绿间真太郎">
+                    <img src="https://static.wikia.nocookie.net/kurokonobasuke/images/6/60/Shintaro_Midorima_Profile.png" class="main-img" alt="Shintarō Midorima">
+                    <img src="https://static.wikia.nocookie.net/kurokonobasuke/images/5/5e/Midorima_Anime.png" class="floating-screenshot fs-3" alt="Midorima Action">
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item"><span class="stat-label">Height:</span> <span class="stat-value">195 cm</span></div>
+                    <div class="stat-item"><span class="stat-label">Weight:</span> <span class="stat-value">79 kg</span></div>
+                    <div class="stat-item"><span class="stat-label">Birthday:</span> <span class="stat-value">Jul 7</span></div>
+                    <div class="stat-item"><span class="stat-label">Team:</span> <span class="stat-value">Shūtoku</span></div>
                 </div>
                 <div class="description">
-                    <p>“今天的幸运物是……”</p>
-                    <p>拥有高超的射篮技术，且射程覆盖全场。性格高傲严谨，非常相信晨间占卜，每天必须携带幸运物。虽然看似冷酷，但其实非常重视团队合作（虽然嘴上不承认）。</p>
+                    <p>An incredible shooter with high accuracy and range covering the entire court. He is very rational and obsessed with daily horoscopes, always carrying his lucky item. He acts cool but cares deeply for his teammates.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 7: 火神大我 -->
+        <!-- Slide 7: Kagami -->
         <div class="slide">
             <div class="content-wrapper">
+                <div class="quote-box">"I'm going to beat the Generation of Miracles and become the best in Japan."</div>
                 <div class="header">
-                    <div class="name-cn">火神大我</div>
-                    <div class="name-jp">Kagami Taiga</div>
-                    <div class="title">诚凛王牌 · 超越奇迹的光</div>
+                    <div class="name-en">Taiga Kagami</div>
+                    <div class="name-jp">火神 大我</div>
+                    <div class="title">The Light of Seirin</div>
                 </div>
                 <div class="character-visual">
-                    <img src="https://picsum.photos/seed/kagami1/200/300" class="floating-screenshot fs-2" alt="scene">
-                    <img src="https://picsum.photos/seed/kagami2/200/300" class="floating-screenshot fs-3" alt="scene">
-                    <img src="https://picsum.photos/seed/kagami_main/400/600" class="main-img" alt="火神大我">
+                    <img src="https://staticia.nocookie.net/kurokonobasuke/images/8/87/Taiga_Kagami_Profile.png/revision/latest?cb=20140401170553" class="main-img" alt="Taiga Kagami">
+                    <img src="https://static.wikia.nocookie.net/kurokonobasuke/images/6/6f/Kagami_Anime.png" class="floating-screenshot fs-1" alt="Kagami Action">
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item"><span class="stat-label">Height:</span> <span class="stat-value">190 cm</span></div>
+                    <div class="stat-item"><span class="stat-label">Weight:</span> <span class="stat-value">82 kg</span></div>
+                    <div class="stat-item"><span class="stat-label">Birthday:</span> <span class="stat-value">Aug 2</span></div>
+                    <div class="stat-item"><span class="stat-label">Team:</span> <span class="stat-value">Seirin</span></div>
                 </div>
                 <div class="description">
-                    <p>“我要打倒奇迹世代，成为全日本第一！”</p>
-                    <p>从美国归归来的篮球少年，拥有惊人的弹跳力和身体素质。作为黑子的“光”，他不断进化，学会了“流星灌篮”和“宽域视野”，是唯一能正面挑战奇迹世代的人。</p>
+                    <p>Returned from America to dominate Japanese basketball. He has amazing jumping ability and physical strength. As Kuroko's "light", he evolved rapidly, learning the Meteor Jam and entering the Zone to challenge the Miracles.</p>
                 </div>
             </div>
         </div>
 
-        <!-- 导航控件 -->
+        <!-- Navigation Controls -->
         <div class="controls">
-            <button class="nav-btn" id="prevBtn" aria-label="上一页"><</button>
+            <button class="nav-btn" id="prevBtn" aria-label="Previous"><</button>
             <div class="pagination" id="pagination">
-                <!-- 由JS生成圆点 -->
+                <!-- Dots generated by JS -->
             </div>
-            <button class="nav-btn" id="nextBtn" aria-label="下一页">></button>
+            <button class="nav-btn" id="nextBtn" aria-label="Next">></button>
         </div>
 
     </div>
@@ -451,7 +528,7 @@
             let currentIndex = 0;
             const totalSlides = slides.length;
 
-            // 初始化分页器
+            // Initialize Pagination
             slides.forEach((_, index) => {
                 const dot = document.createElement('div');
                 dot.classList.add('dot');
@@ -461,7 +538,6 @@
 
             const dots = document.querySelectorAll('.dot');
 
-            // 更新幻灯片状态
             function updateSlides() {
                 slides.forEach((slide, index) => {
                     slide.classList.remove('active', 'prev', 'next');
@@ -474,32 +550,27 @@
                     }
                 });
 
-                // 更新分页点
                 dots.forEach((dot, index) => {
                     dot.classList.toggle('active', index === currentIndex);
                 });
             }
 
-            // 下一张
             function nextSlide() {
                 currentIndex = (currentIndex + 1) % totalSlides;
                 updateSlides();
             }
 
-            // 上一张
             function prevSlide() {
                 currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
                 updateSlides();
             }
 
-            // 按钮事件监听
             nextBtn.addEventListener('click', nextSlide);
             prevBtn.addEventListener('click', prevSlide);
 
-            // 触摸滑动支持
+            // Touch Swipe Support
             let touchStartX = 0;
             let touchEndX = 0;
-
             const sliderContainer = document.getElementById('slider');
 
             sliderContainer.addEventListener('touchstart', (e) => {
@@ -512,7 +583,7 @@
             }, { passive: true });
 
             function handleSwipe() {
-                const threshold = 50; // 滑动阈值
+                const threshold = 50;
                 if (touchEndX < touchStartX - threshold) {
                     nextSlide();
                 }
@@ -524,3 +595,4 @@
     </script>
 </body>
 </html>
+
