@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kuroko no Basuke - Character Profiles</title>
+    <style>
+        /* --- Global Variables & Reset --- */
+        :root {
+            --c-red: #8E2323; /* Vermilion */
+            --c-gold: #C5A065; /* Gold */
+            --c-ink: #1A1A1A; /* Ink Black */
+            --c-paper: #F4F1EA; /* Rice Paper */
+            --c-overlay: rgba(0, 0, 0, 0.6);
+            --font-serif: "Noto Serif SC", "Georgia", "Times New Roman", serif;
+            --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-serif);
+            background-color: var(--c-ink);
+            color: var(--c-ink);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- Background Ink Effect --- */
+        .bg-ink {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 30%, transparent 20%, #000 120%);
+            z-index: -2;
+            opacity: 0.95;
+        }
+
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(142, 35, 35, 0.15) 0%, transparent 70%);
+            z-index: -1;
+            animation: breathe 8s infinite alternate;
+        }
+
+        @keyframes breathe {
+            0% { transform: scale(1); opacity: 0.5; }
+            100% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        /* --- Slider Container --- */
+        .slider-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.8s var(--ease-out);
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            background: var(--c-paper);
+            border: 2px solid var(--c-gold);
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.1);
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 10;
+        }
+
+        .slide.prev {
+            transform: translateX(-100%) scale(0.9);
+            opacity: 0;
+        }
+
+        .slide.next {
+            transform: translateX(100%) scale(0.9);
+            opacity: 0;
+        }
+
+        /* --- Character Content Layout --- */
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            z-index: 2;
+            height: 100%;
+            position: relative;
+            padding-top: 10px;
+        }
+
+        /* Quote Section */
+        .quote-box {
+            text-align: center;
+            margin-bottom: 10px;
+            font-style: italic;
+            color: var(--c-red);
+            font-size: 0.9rem;
+            font-weight: bold;
+            padding: 0 10px;
+            border-top: 1px solid var(--c-gold);
+            border-bottom: 1px solid var(--c-gold);
+            background: rgba(255,255,255,0.4);
+            width: 90%;
+            padding: 8px 0;
+        }
+
+        /* Header Section */
+        .header {
+            text-align: center;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        .name-en {
+            font-size: 2rem;
+            color: var(--c-red);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 1px 1px 0px rgba(0,0,0,0.2);
+        }
+
+        .name-jp {
+            font-size: 1rem;
+            color: var(--c-gold);
+            margin-top: 2px;
+            font-style: italic;
+        }
+
+        .title {
+            font-size: 0.85rem;
+            color: #444;
+            margin-top: 5px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Image Section */
+        .character-visual {
+            position: relative;
+            width: 100%;
+            height: 38vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .main-img {
+            height: 100%;
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+            filter: drop-shadow(5px 5px 10px rgba(0,0,0,0.3));
+            z-index: 10;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Floating Screenshots */
+        .floating-screenshot {
+            position: absolute;
+            width: 100px;
+            height: 150px;
+            object-fit: cover;
+            border: 2px solid var(--c-gold);
+            border-radius: 4px;
+            opacity: 0.8;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            z-index: 5;
+            filter: sepia(0.2) contrast(1.1);
+        }
+
+        .fs-1 { top: 5%; left: 5%; animation: float 7s ease-in-out infinite 0.5s; }
+        .fs-2 { bottom: 5%; right: 5%; animation: float 8s ease-in-out infinite 1s; }
+        .fs-3 { top: 15%; right: 10%; width: 80px; height: 80px; border-radius: 50%; animation: float 9s ease-in-out infinite 1.5s; }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            width: 100%;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+            background: rgba(255,255,255,0.5);
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid rgba(197, 160, 101, 0.3);
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .stat-label {
+            color: #666;
+            font-weight: bold;
+        }
+
+        .stat-value {
+            color: var(--c-ink);
+        }
+
+        /* Description Section */
+        .description {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 12px;
+            border-radius: 4px;
+            border-left: 4px solid var(--c-red);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            flex-grow: 1;
+            width: 100%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            text-align: justify;
+            overflow-y: auto;
+            margin-bottom: 60px; /* Space for controls */
+        }
+
+        /* --- Navigation Controls --- */
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            z-index: 20;
+        }
+
+        .nav-btn {
+            background: var(--c-paper);
+            border: 2px solid var(--c-red);
+            color: var(--c-red);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s;
+            font-family: sans-serif;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .nav-btn:active {
+            background: var(--c-red);
+            color: white;
+            transform: scale(0.9);
+        }
+
+        .pagination {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: rgba(142, 35, 35, 0.3);
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background: var(--c-red);
+            transform: scale(1.5);
+        }
+
+        /* --- Animations --- */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* Scrollbar styling */
+        .description::-webkit-scrollbar {
+            width: 4px;
+        }
+        .description::-webkit-scrollbar-thumb {
+            background: var(--c-gold);
+            border-radius: 2px;
+        }
+
+        @media (min-width: 768px) {
+            .slide {
+                max-width: 450px;
+                height: 90vh;
+                border-radius: 10px;
+                margin: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Decoration -->
+    <div class="bg-ink"></div>
+    <div class="bg-circle" style="top: -10%; left: -10%; width: 300px; height: 300px;"></div>
+    <div class="bg-circle" style="bottom: -10%; right: -10%; width: 400px; height: 400px;"></div>
+
+    <div class="slider-container" id="slider">
+        
+        <!-- Slide 1: Aomine -->
+        <div class="slide active">
+            <div class="content-wrapper">
+                <div class="quote-box">"The only one who can beat me is me."</div>
+                <div class="header">
+                    <div class="name-en">Daiki Aomine</div>
+                    <div class="name-jp">青峰 大輝</div>
+                    <div class="title">The Ace of Generation of Miracles</div>
+                </div>
+                <div class="character-visual">
+                    <!-- STABLE IMAGE SOURCE -->
+                    <img src="https://avatars.mds.yandex.net/i?id=480dde49ebac5cb5b16a23abb8791cf0_l-6824648-images-thumbs&n=13" class="main-img" alt="Daiki Aomine">
+                    <img src="https://avatars.mds.yandex.net/i?id=f1c7837b1c3c18a695999565758bccd0_l-5887690-images-thumbs&n=13" class="floating-screenshot fs-1" alt="Aomine Action">
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item"><span class="stat-label">Height:</span> <span class="stat-value">192 cm</span></div>
+                    <div class="stat-item"><span class="stat-label">Weight:</span> <span class="stat-value">85 kg</span></div>
+                    <div class="stat-item"><span class="stat-label">Birthday:</span> <span class="stat-value">Aug 31</span></div>
+                    <div class="stat-item"><span class="stat-label">Team:</span> <span class="stat-value">Tōō</span></div>
+                </div>
+                <div class="description">
+                    <p>Former ace of Teikō Middle School. He possesses abilities that surpass all other players. His style is formless and free, making him unpredictable. He lost his passion for basketball due to lack of competition until he met Kagami.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Murasakibara -->
+        <div class="slide">
+            <div class="content-wrapper">
+                <div class="quote-box">"Sweets are justice. Basketball is just a club activity."</div>
+                <div class="header">
+                    <div class="name-en">Atsushi Murasakibara</div>
+                    <div class="name-jp">紫原 敦</div>
+                    <div class="title">The Iron Heart of Generation of Miracles</div>
+                </div>
+                <div class="character-visual">
+                    <!-- STABLE IMAGE SOURCE -->
+                    <img src="https://i.pinimg.com/736x/b1/09/65/b1096574aff00525dbd5560ca3d00a30.jpg" class="main-img" alt="Atsushi Murasakibara">
+                    <img src="https://i.pinimg.com/originals/71/dd/9e/71dd9eccac9266629d7fe6637228b07d.jpg?nii=t" class="floating-screenshot fs-2" alt="Murasakibara Action">
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item"><span class="stat-label">Height:</span> <span class="stat-value">208 cm</span></div>
+                    <div class="stat-item"><span class="stat-label">Weight:</span> <span class="stat-value">99 kg</span></div>
+                    <div class="stat-item"><span class="stat-label">Birthday:</span> <span class="stat-value">Oct 9</span></div>
+                    <div class="stat-item"><span class="stat-label">Team:</span> <span class="stat-value">Yōsen</span></div>
+                </div>
+                <div class="description">
+                    <p>Towering center with immense strength and defensive reach. Although he claims to hate basketball, he is a genius at it. He dominates the paint with his "Thor's Hammer" spike and is nearly unstoppable when serious.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Kise -->
+        <div class="slide">
+            <div class="content-wrapper">
+                <div class="quote-box">"I'll show you that I can beat you, copying you or not!"</div>
+                <div class="header">
+                    <div class="name-en">Ryōta Kise</div>
+                    <div class="name-jp">黄瀬 涼太</div>
+                    <div class="title">The Copycat of Generation of Miracles</div>
+                </div>
+                <div class="character-visual">
+                    <!-- STABLE IMAGE SOURCE -->
+                    <img src="https://i.pinimg.com/736x/12/cd/3d/12cd3d83ba4be05c458fbff0dcd85ec5.jpg" class="main-img" alt="Ryōta Kise">
+                    <img src="https://i.pinimg.com/736x/d1/f8/aa/d1f8aa2b6a7317a8971fc3e21c4d5c56.jpg" class="floating-screenshot fs-3" alt="Kise Action">
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item"><span class="stat-label">Height:</span> <span class="stat-value">189 cm</span></div>
+                    <div class="stat-item"><span class="stat-label">Weight:</span> <span class="stat-value">77 kg</span></div>
+                    <div class="stat-item"><span class="stat-label">Birthday:</span> <span class="stat-value">Jun 18</span></div>
+                    <div class="stat-item"><span class="stat-label">Team:</span> <span class="stat-value">Kaijō</span></div>
+                </div>
+                <div class="description">
+                    <p>A popular model who started basketball late but mastered it instantly. His "Perfect Copy" allows him to mimic any move he sees, even those of the Generation of Miracles. He can combine moves to create even stronger techniques.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Kuroko -->
+        <div class="slide">
+            <div class="content-wrapper">
+                <div class="quote-box">"I am the shadow. The shadow becomes darker when the light is stronger."</div>
+                <div class="header">
+                    <div class="name-en">Tetsuya Kuroko</div>
+                    <div class="name-jp">黒子 テツヤ</div>
+                    <div class="title">The Phantom Sixth Man</div>
+                </div>
+                <div class="character-visual">
+                    <!-- STABLE IMAGE SOURCE -->
+                    <img src="https://i.pinimg.com/originals/26/5d/03/265d03c6148c2ff9fa886223172a49a9.jpg?nii=t" class="main-img" alt="Tetsuya Kuroko">
+                    <img src="https://i.pinimg.com/736x/3b/8e/e8/3b8ee8eb0e4c84358300120c715dc06f.jpg" class="floating-screenshot fs-1" alt="Kuroko Action">
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item"><span class="stat-label">Height:</span> <span class="stat-value">168 cm</span></div>
+                    <div class="stat-item"><span class="stat-label">Weight:</span> <span class="stat-value">57 kg</span></div>
+                    <div class="stat-item"><span class="stat-label">Birthday:</span> <span class="stat-value">Jan 31</span></div>
+                    <div class="stat-item"><span class="stat-label">Team:</span> <span class="stat-value">Seirin</span></div>
+                </div>
+                <div class="description">
+                    <p>Lack of presence allows him to act as a "shadow," passing the ball unnoticed to his "light." He specializes in misdirection and passing. Though physically weak, his determination to make his team win is unmatched.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Akashi -->
+        <div class="slide">
+            <div class="content-wrapper">
+                <div class="quote-box">"I am absolute. Victory is everything."</div>
+                <div class="header">
+                    <div class="name-en">Seijūrō Akashi</div>
+                    <div class="name-jp">赤司 征十郎</div>
+                    <div class="title">The Emperor of Generation of Miracles</div>
+                </div>
+                <div class="character-visual">
+                    <!-- STABLE IMAGE SOURCE -->
+                    <img src="https://i.pinimg.com/736x/54/3a/61/543a614e1e029927ba70c8d4861b0b2b.jpg" class="main-img" alt="Seijūrō Akashi">
+                    <img src="https://i.pinimg.com/736x/ab/bb/00/abbb00d5d6df1ff7cc3adfe779032059.jpg" class="floating-screenshot fs-2" alt="Akashi Action">
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item"><span class="stat-label">Height:</span> <span class="stat-value">173 cm</span></div>
+                    <div class="stat-item"><span class="stat-label">Weight:</span> <span class="stat-value">64 kg</span></div>
+                    <div class="stat-item"><span class="stat-label">Birthday:</span> <span class="stat-value">Dec 20</span></div>
+                    <div class="stat-item"><span class="stat-label">Team:</span> <span class="stat-value">Rakuzan</span></div>
+                </div>
+                <div class="description">
+                    <p>The former captain of Teikō and Rakuzan. Possesses the "Emperor Eye" which allows him to see future movements. He is a master tactician and ball handler. His absolute confidence leads him to believe he cannot lose.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Midorima -->
+        <div class="slide">
+            <div class="content-wrapper">
+                <div class="quote-box">"Man proposes, God disposes. But I trust my horoscope."</div>
+                <div class="header">
+                    <div class="name-en">Shintarō Midorima</div>
+                    <div class="name-jp">緑間 真太郎</div>
+                    <div class="title">The Shooter of Generation of Miracles</div>
+                </div>
+                <div class="character-visual">
+                    <!-- STABLE IMAGE SOURCE -->
+                    <img src="https://i.pinimg.com/474x/7c/32/4e/7c324eb830f237cca413290816604850.jpg" class="main-img" alt="Shintarō Midorima">
+                    <img src="https://i.pinimg.com/originals/25/57/0c/25570c87c6a8bbcb85cc3620445a6b42.jpg?nii=t" class="floating-screenshot fs-3" alt="Midorima Action">
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item"><span class="stat-label">Height:</span> <span class="stat-value">195 cm</span></div>
+                    <div class="stat-item"><span class="stat-label">Weight:</span> <span class="stat-value">79 kg</span></div>
+                    <div class="stat-item"><span class="stat-label">Birthday:</span> <span class="stat-value">Jul 7</span></div>
+                    <div class="stat-item"><span class="stat-label">Team:</span> <span class="stat-value">Shūtoku</span></div>
+                </div>
+                <div class="description">
+                    <p>An incredible shooter with high accuracy and range covering the entire court. He is very rational and obsessed with daily horoscopes, always carrying his lucky item. He acts cool but cares deeply for his teammates.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Kagami -->
+        <div class="slide">
+            <div class="content-wrapper">
+                <div class="quote-box">"I'm going to beat the Generation of Miracles and become the best in Japan."</div>
+                <div class="header">
+                    <div class="name-en">Taiga Kagami</div>
+                    <div class="name-jp">火神 大我</div>
+                    <div class="title">The Light of Seirin</div>
+                </div>
+                <div class="character-visual">
+                    <!-- STABLE IMAGE SOURCE -->
+                    <img src="https://i.pinimg.com/736x/a5/7f/40/a57f40d633700919a7e73c4761197184.jpg" class="main-img" alt="Taiga Kagami">
+                    <img src="https://i.pinimg.com/originals/83/d8/25/83d8250a71e4541555a15b86c682eff6.jpg" class="floating-screenshot fs-1" alt="Kagami Action">
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item"><span class="stat-label">Height:</span> <span class="stat-value">190 cm</span></div>
+                    <div class="stat-item"><span class="stat-label">Weight:</span> <span class="stat-value">82 kg</span></div>
+                    <div class="stat-item"><span class="stat-label">Birthday:</span> <span class="stat-value">Aug 2</span></div>
+                    <div class="stat-item"><span class="stat-label">Team:</span> <span class="stat-value">Seirin</span></div>
+                </div>
+                <div class="description">
+                    <p>Returned from America to dominate Japanese basketball. He has amazing jumping ability and physical strength. As Kuroko's "light", he evolved rapidly, learning the Meteor Jam and entering the Zone to challenge the Miracles.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Controls -->
+        <div class="controls">
+            <button class="nav-btn" id="prevBtn" aria-label="Previous"><</button>
+            <div class="pagination" id="pagination">
+                <!-- Dots generated by JS -->
+            </div>
+            <button class="nav-btn" id="nextBtn" aria-label="Next">></button>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const pagination = document.getElementById('pagination');
+            let currentIndex = 0;
+            const totalSlides = slides.length;
+
+            // Initialize Pagination
+            slides.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                if (index === 0) dot.classList.add('active');
+                pagination.appendChild(dot);
+            });
+
+            const dots = document.querySelectorAll('.dot');
+
+            function updateSlides() {
+                slides.forEach((slide, index) => {
+                    slide.classList.remove('active', 'prev', 'next');
+                    if (index === currentIndex) {
+                        slide.classList.add('active');
+                    } else if (index < currentIndex) {
+                        slide.classList.add('prev');
+                    } else {
+                        slide.classList.add('next');
+                    }
+                });
+
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentIndex);
+                });
+            }
+
+            function nextSlide() {
+                currentIndex = (currentIndex + 1) % totalSlides;
+                updateSlides();
+            }
+
+            function prevSlide() {
+                currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+                updateSlides();
+            }
+
+            nextBtn.addEventListener('click', nextSlide);
+            prevBtn.addEventListener('click', prevSlide);
+
+            // Touch Swipe Support
+            let touchStartX = 0;
+            let touchEndX = 0;
+            const sliderContainer = document.getElementById('slider');
+
+            sliderContainer.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            sliderContainer.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, { passive: true });
+
+            function handleSwipe() {
+                const threshold = 50;
+                if (touchEndX < touchStartX - threshold) {
+                    nextSlide();
+                }
+                if (touchEndX > touchStartX + threshold) {
+                    prevSlide();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
