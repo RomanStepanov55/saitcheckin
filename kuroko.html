@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>黑子的篮球 - 奇迹世代与火神</title>
+    <style>
+        /* --- 全局变量与重置 --- */
+        :root {
+            --c-red: #8E2323; /* 朱红 */
+            --c-gold: #C5A065; /* 琉璃金 */
+            --c-ink: #1A1A1A; /* 墨黑 */
+            --c-paper: #F4F1EA; /* 宣纸白 */
+            --c-overlay: rgba(0, 0, 0, 0.6);
+            --font-serif: "Noto Serif SC", "SimSun", "Songti SC", serif;
+            --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-serif);
+            background-color: var(--c-ink);
+            color: var(--c-ink);
+            overflow: hidden; /* 防止滚动，使用幻灯片切换 */
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- 背景水墨效果 --- */
+        .bg-ink {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 50% 30%, transparent 20%, #000 120%),
+                url('https://www.transparenttextures.com/patterns/black-paper.png'); /* 纸张纹理 */
+            z-index: -2;
+            opacity: 0.9;
+        }
+
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(142, 35, 35, 0.2) 0%, transparent 70%);
+            z-index: -1;
+            animation: breathe 8s infinite alternate;
+        }
+
+        @keyframes breathe {
+            0% { transform: scale(1); opacity: 0.5; }
+            100% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        /* --- 幻灯片容器 --- */
+        .slider-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.8s var(--ease-out);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background: var(--c-paper);
+            /* 装饰性边框 */
+            border: 2px solid var(--c-gold);
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.1);
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+        }
+
+        .slide.prev {
+            transform: translateX(-100%) scale(0.9);
+            opacity: 0;
+        }
+
+        .slide.next {
+            transform: translateX(100%) scale(0.9);
+            opacity: 0;
+        }
+
+        /* --- 角色内容布局 --- */
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 2;
+            height: 100%;
+            position: relative;
+        }
+
+        /* 标题区 */
+        .header {
+            text-align: center;
+            margin-top: 10px;
+            border-bottom: 1px solid var(--c-red);
+            padding-bottom: 10px;
+            width: 80%;
+        }
+
+        .name-cn {
+            font-size: 2.5rem;
+            color: var(--c-red);
+            font-weight: bold;
+            letter-spacing: 5px;
+            text-shadow: 1px 1px 0px rgba(0,0,0,0.2);
+        }
+
+        .name-jp {
+            font-size: 1rem;
+            color: var(--c-gold);
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .title {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        /* 图片区 */
+        .character-visual {
+            position: relative;
+            width: 100%;
+            height: 45vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .main-img {
+            width: auto;
+            height: 100%;
+            max-width: 90%;
+            object-fit: contain;
+            filter: drop-shadow(5px 5px 10px rgba(0,0,0,0.3));
+            z-index: 10;
+            /* 默认漂浮动画 */
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* 漂浮的背景截图 */
+        .floating-screenshot {
+            position: absolute;
+            width: 120px;
+            height: 180px;
+            object-fit: cover;
+            border: 3px solid var(--c-gold);
+            border-radius: 4px;
+            opacity: 0.8;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            z-index: 5;
+            filter: sepia(0.3) contrast(1.1);
+        }
+
+        .fs-1 { top: 10%; left: 5%; animation: float 7s ease-in-out infinite 0.5s; }
+        .fs-2 { bottom: 10%; right: 5%; animation: float 8s ease-in-out infinite 1s; }
+        .fs-3 { top: 20%; right: 10%; width: 100px; height: 100px; border-radius: 50%; animation: float 9s ease-in-out infinite 1.5s; }
+
+        /* 描述区 */
+        .description {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid var(--c-red);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            max-height: 25vh;
+            overflow-y: auto;
+            width: 100%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            text-align: justify;
+        }
+
+        /* --- 导航控制 --- */
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            z-index: 20;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 2px solid var(--c-red);
+            color: var(--c-red);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s;
+            font-family: sans-serif;
+        }
+
+        .nav-btn:active {
+            background: var(--c-red);
+            color: white;
+            transform: scale(0.9);
+        }
+
+        .pagination {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: rgba(142, 35, 35, 0.3);
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background: var(--c-red);
+            transform: scale(1.5);
+        }
+
+        /* --- 动画关键帧 --- */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* --- 滚动条美化 --- */
+        .description::-webkit-scrollbar {
+            width: 4px;
+        }
+        .description::-webkit-scrollbar-thumb {
+            background: var(--c-gold);
+            border-radius: 2px;
+        }
+
+        /* 响应式微调 */
+        @media (min-width: 768px) {
+            .slide {
+                max-width: 480px;
+                height: 90vh;
+                border-radius: 10px;
+                margin: auto;
+            }
+            .bg-ink {
+                background-size: cover;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 背景装饰 -->
+    <div class="bg-ink"></div>
+    <div class="bg-circle" style="top: -10%; left: -10%; width: 300px; height: 300px;"></div>
+    <div class="bg-circle" style="bottom: -10%; right: -10%; width: 400px; height: 400px;"></div>
+
+    <div class="slider-container" id="slider">
+        
+        <!-- Slide 1: 青峰大辉 -->
+        <div class="slide active">
+            <div class="content-wrapper">
+                <div class="header">
+                    <div class="name-cn">青峰大辉</div>
+                    <div class="name-jp">Aomine Daiki</div>
+                    <div class="title">原奇迹世代 · 不完全的杰作</div>
+                </div>
+                <div class="character-visual">
+                    <!-- 漂浮的背景截图 -->
+                    <img src="https://picsum.photos/seed/aomine1/200/300" class="floating-screenshot fs-1" alt="scene">
+                    <img src="https://picsum.photos/seed/aomine2/200/300" class="floating-screenshot fs-2" alt="scene">
+                    <!-- 主图 -->
+                    <img src="https://picsum.photos/seed/aomine_main/400/600" class="main-img" alt="青峰大辉">
+                </div>
+                <div class="description">
+                    <p>“我是最强的。”</p>
+                    <p>拥有超越常理的身体素质和篮球天赋。曾经是黑子的光，后来因为过于强大而失去了对篮球的热情。他的打球风格自由奔放，无法被预测。只有遇到更强的对手，他才会真正觉醒。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: 紫原敦 -->
+        <div class="slide">
+            <div class="content-wrapper">
+                <div class="header">
+                    <div class="name-cn">紫原敦</div>
+                    <div class="name-jp">Murasakibara Atsushi</div>
+                    <div class="title">原奇迹世代 · 破坏的铁锤</div>
+                </div>
+                <div class="character-visual">
+                    <img src="https://picsum.photos/seed/mura1/200/300" class="floating-screenshot fs-1" alt="scene">
+                    <img src="https://picsum.photos/seed/mura2/200/300" class="floating-screenshot fs-3" alt="scene">
+                    <img src="https://picsum.photos/seed/mura_main/400/600" class="main-img" alt="紫原敦">
+                </div>
+                <div class="description">
+                    <p>“因为讨厌打篮球……所以还是快点结束吧。”</p>
+                    <p>身高接近两米，拥有惊人的臂展和防守覆盖面积。虽然平时懒散爱吃零食，但一旦被激怒，破坏力堪比怪兽。他在内线的统治力是绝对的，能够轻松摧毁对手的进攻。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: 黄濑凉太 -->
+        <div class="slide">
+            <div class="content-wrapper">
+                <div class="header">
+                    <div class="name-cn">黄濑凉太</div>
+                    <div class="name-jp">Kise Ryōta</div>
+                    <div class="title">原奇迹世代 · 天才的模仿者</div>
+                </div>
+                <div class="character-visual">
+                    <img src="https://picsum.photos/seed/kise1/200/300" class="floating-screenshot fs-2" alt="scene">
+                    <img src="https://picsum.photos/seed/kise_main/400/600" class="main-img" alt="黄濑凉太">
+                </div>
+                <div class="description">
+                    <p>“不管是怎样的技能，只要我看过一次就能完美复制。”</p>
+                    <p>原本是模特，接触篮球时间虽短但进步神速。拥有“完美复制”的能力，不仅能模仿对手的招式，还能将其组合运用出更强的效果。对黑子有着特殊的执着。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: 黑子哲也 -->
+        <div class="slide">
+            <div class="content-wrapper">
+                <div class="header">
+                    <div class="name-cn">黑子哲也</div>
+                    <div class="name-jp">Kuroko Tetsuya</div>
+                    <div class="title">幻之第六人 · 影子</div>
+                </div>
+                <div class="character-visual">
+                    <img src="https://picsum.photos/seed/kuroko1/200/300" class="floating-screenshot fs-1" alt="scene">
+                    <img src="https://picsum.photos/seed/kuroko2/200/300" class="floating-screenshot fs-2" alt="scene">
+                    <img src="https://picsum.photos/seed/kuroko_main/400/600" class="main-img" alt="黑子哲也">
+                </div>
+                <div class="description">
+                    <p>“我是影子，影子越淡，光就越强。”</p>
+                    <p>存在感稀薄到让人经常忽略他的存在。利用视线诱导（Misdirection）在球场上神出鬼没地传球。虽然身体素质普通，但为了胜利有着比任何人都坚韧的意志。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: 赤司征十郎 -->
+        <div class="slide">
+            <div class="content-wrapper">
+                <div class="header">
+                    <div class="name-cn">赤司征十郎</div>
+                    <div class="name-jp">Akashi Seijūrō</div>
+                    <div class="title">原奇迹世代 · 天帝之眼</div>
+                </div>
+                <div class="character-visual">
+                    <img src="https://picsum.photos/seed/akashi1/200/300" class="floating-screenshot fs-3" alt="scene">
+                    <img src="https://picsum.photos/seed/akashi_main/400/600" class="main-img" alt="赤司征十郎">
+                </div>
+                <div class="description">
+                    <p>“胜利就是一切，败者没有任何价值。”</p>
+                    <p>奇迹世代的队长，拥有统御力和广阔的视野。他的“天帝之眼”能看穿对手的一切动作。在经历变故后，性格变得更加冷酷绝对，是所有人中最强的存在。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: 绿间真太郎 -->
+        <div class="slide">
+            <div class="content-wrapper">
+                <div class="header">
+                    <div class="name-cn">绿间真太郎</div>
+                    <div class="name-jp">Midorima Shintarō</div>
+                    <div class="title">原奇迹世代 · 全能射手</div>
+                </div>
+                <div class="character-visual">
+                    <img src="https://picsum.photos/seed/mido1/200/300" class="floating-screenshot fs-1" alt="scene">
+                    <img src="https://picsum.photos/seed/mido_main/400/600" class="main-img" alt="绿间真太郎">
+                </div>
+                <div class="description">
+                    <p>“今天的幸运物是……”</p>
+                    <p>拥有高超的射篮技术，且射程覆盖全场。性格高傲严谨，非常相信晨间占卜，每天必须携带幸运物。虽然看似冷酷，但其实非常重视团队合作（虽然嘴上不承认）。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: 火神大我 -->
+        <div class="slide">
+            <div class="content-wrapper">
+                <div class="header">
+                    <div class="name-cn">火神大我</div>
+                    <div class="name-jp">Kagami Taiga</div>
+                    <div class="title">诚凛王牌 · 超越奇迹的光</div>
+                </div>
+                <div class="character-visual">
+                    <img src="https://picsum.photos/seed/kagami1/200/300" class="floating-screenshot fs-2" alt="scene">
+                    <img src="https://picsum.photos/seed/kagami2/200/300" class="floating-screenshot fs-3" alt="scene">
+                    <img src="https://picsum.photos/seed/kagami_main/400/600" class="main-img" alt="火神大我">
+                </div>
+                <div class="description">
+                    <p>“我要打倒奇迹世代，成为全日本第一！”</p>
+                    <p>从美国归归来的篮球少年，拥有惊人的弹跳力和身体素质。作为黑子的“光”，他不断进化，学会了“流星灌篮”和“宽域视野”，是唯一能正面挑战奇迹世代的人。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 导航控件 -->
+        <div class="controls">
+            <button class="nav-btn" id="prevBtn" aria-label="上一页"><</button>
+            <div class="pagination" id="pagination">
+                <!-- 由JS生成圆点 -->
+            </div>
+            <button class="nav-btn" id="nextBtn" aria-label="下一页">></button>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const pagination = document.getElementById('pagination');
+            let currentIndex = 0;
+            const totalSlides = slides.length;
+
+            // 初始化分页器
+            slides.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                if (index === 0) dot.classList.add('active');
+                pagination.appendChild(dot);
+            });
+
+            const dots = document.querySelectorAll('.dot');
+
+            // 更新幻灯片状态
+            function updateSlides() {
+                slides.forEach((slide, index) => {
+                    slide.classList.remove('active', 'prev', 'next');
+                    if (index === currentIndex) {
+                        slide.classList.add('active');
+                    } else if (index < currentIndex) {
+                        slide.classList.add('prev');
+                    } else {
+                        slide.classList.add('next');
+                    }
+                });
+
+                // 更新分页点
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentIndex);
+                });
+            }
+
+            // 下一张
+            function nextSlide() {
+                currentIndex = (currentIndex + 1) % totalSlides;
+                updateSlides();
+            }
+
+            // 上一张
+            function prevSlide() {
+                currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+                updateSlides();
+            }
+
+            // 按钮事件监听
+            nextBtn.addEventListener('click', nextSlide);
+            prevBtn.addEventListener('click', prevSlide);
+
+            // 触摸滑动支持
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            const sliderContainer = document.getElementById('slider');
+
+            sliderContainer.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            sliderContainer.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, { passive: true });
+
+            function handleSwipe() {
+                const threshold = 50; // 滑动阈值
+                if (touchEndX < touchStartX - threshold) {
+                    nextSlide();
+                }
+                if (touchEndX > touchStartX + threshold) {
+                    prevSlide();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
