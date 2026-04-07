@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Продвижение Технологий | Ultra Flagships</title>
+    <style>
+        /* --- 基础设置 --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #ffffff;
+            overflow: hidden;
+            background-color: #0f0f0f;
+        }
+
+        /* --- 动态渐变背景 (灰色、橙色、浅黑) --- */
+        .animated-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: radial-gradient(circle at 50% 50%, #2a2a2a 0%, #1a1a1a 50%, #0d0d0d 100%);
+        }
+
+        /* 橙色光晕叠加 */
+        .glow-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 80% 20%, rgba(255, 140, 0, 0.15), transparent 40%),
+                        radial-gradient(circle at 20% 80%, rgba(255, 69, 0, 0.1), transparent 40%);
+            pointer-events: none;
+        }
+
+        /* --- 科技粒子背景 Canvas --- */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        /* --- 滚动容器 --- */
+        .slider-container {
+            height: 100vh;
+            width: 100vw;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
+        /* --- 滑块样式 --- */
+        .slide {
+            height: 100vh;
+            width: 100vw;
+            scroll-snap-align: start;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* --- 内容布局 --- */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            max-width: 1200px;
+            width: 100%;
+            z-index: 2;
+            align-items: center;
+        }
+
+        /* 文本区域 */
+        .text-section {
+            text-align: left;
+            padding: 1rem;
+        }
+
+        .brand-tag {
+            display: inline-block;
+            padding: 6px 16px;
+            background: rgba(255, 140, 0, 0.15);
+            border: 1px solid rgba(255, 140, 0, 0.5);
+            border-radius: 4px;
+            color: #ff9d00;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        h1 {
+            font-size: 3rem;
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #fff, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            color: #888;
+            font-weight: 300;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* 参数网格 */
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .spec-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .spec-card:hover {
+            transform: translateY(-5px);
+            border-color: #ff9d00;
+        }
+
+        .spec-label {
+            font-size: 0.75rem;
+            color: #ff9d00;
+            text-transform: uppercase;
+            margin-bottom: 0.3rem;
+            display: block;
+        }
+
+        .spec-value {
+            font-size: 0.95rem;
+            color: #eee;
+        }
+
+        /* 图片区域 */
+        .image-section {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .phone-mockup {
+            width: 100%;
+            max-width: 320px;
+            border-radius: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            border: 4px solid #333;
+            position: relative;
+            z-index: 2;
+            transition: transform 0.5s ease;
+        }
+
+        .slide.active .phone-mockup {
+            transform: rotate(-3deg) scale(1.02);
+        }
+
+        /* 装饰性数据图表 (填补空白) */
+        .tech-decoration {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 20px;
+        }
+
+        .data-bar {
+            width: 4px;
+            background: rgba(255, 140, 0, 0.5);
+            margin: 0 4px;
+            border-radius: 2px;
+            animation: equalizer 1.5s infinite ease-in-out;
+        }
+
+        @keyframes equalizer {
+            0%, 100% { height: 20%; opacity: 0.5; }
+            50% { height: 80%; opacity: 1; background: #ff9d00; }
+        }
+
+        /* --- 导航 --- */
+        .pagination {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .dot.active {
+            background: #ff9d00;
+            width: 20px;
+            border-radius: 3px;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 40px;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* --- 响应式 --- */
+        @media (min-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .text-section {
+                text-align: left;
+                padding-right: 2rem;
+            }
+            h1 { font-size: 4.5rem; }
+            .phone-mockup { max-width: 400px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 背景层 -->
+    <div class="animated-background"></div>
+    <div class="glow-overlay"></div>
+    <canvas id="particle-canvas"></canvas>
+
+    <header>
+        <div class="logo">Tech Evolution <span style="color:#ff9d00">2026</span></div>
+        <div style="font-size: 0.9rem; opacity: 0.7;">MENU</div>
+    </header>
+
+    <div class="pagination" id="pagination"></div>
+
+    <main class="slider-container" id="slider">
+        
+        <!-- Slide 1: Intro -->
+        <section class="slide active" data-index="0">
+            <div class="content-grid">
+                <div class="text-section">
+                    <span class="brand-tag">Concept</span>
+                    <h1>Продвижение<br>Технологий</h1>
+                    <h2>Эра Ультрафлагманов</h2>
+                    <p style="color: #ccc; line-height: 1.6; max-width: 500px;">
+                        Добро пожаловать в будущее мобильной индустрии. 
+                        Мы собрали самые смелые прогнозы и концепции 2025-2026 годов. 
+                        Смахните вниз, чтобы увидеть технологии, которые изменят мир.
+                    </p>
+                </div>
+                <div class="image-section">
+                    <img src="https://picsum.photos/seed/techintro/400/600" alt="Future Tech" class="phone-mockup">
+                    <div class="tech-decoration">
+                        <div class="data-bar" style="animation-delay: 0.1s"></div>
+                        <div class="data-bar" style="animation-delay: 0.3s"></div>
+                        <div class="data-bar" style="animation-delay: 0.5s"></div>
+                        <div class="data-bar" style="animation-delay: 0.2s"></div>
+                        <div class="data-bar" style="animation-delay: 0.4s"></div>
+                        <div class="data-bar" style="animation-delay: 0.1s"></div>
+                        <div class="data-bar" style="animation-delay: 0.6s"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 2: Vivo X300 Pro -->
+        <section class="slide" data-index="1">
+            <div class="content-grid">
+                <div class="text-section">
+                    <span class="brand-tag">Vivo</span>
+                    <h1>X300 Pro</h1>
+                    <h2>Абсолютный Камерофон</h2>
+                    <div class="specs-grid">
+                        <div class="spec-card">
+                            <span class="spec-label">Процессор</span>
+                            <div class="spec-value">Snapdragon 8 Gen 5</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Основная камера</span>
+                            <div class="spec-value">200MP 1" Sensor</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Батарея</span>
+                            <div class="spec-value">6000mAh Silicon-C</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Дисплей</span>
+                            <div class="spec-value">2K 144Hz LTPO 2.0</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="image-section">
+                    <img src="https://picsum.photos/seed/vivox300/400/600" alt="Vivo X300 Pro" class="phone-mockup">
+                    <div class="tech-decoration">
+                        <div class="data-bar" style="animation-delay: 0.2s"></div>
+                        <div class="data-bar" style="animation-delay: 0.1s"></div>
+                        <div class="data-bar" style="animation-delay: 0.5s"></div>
+                        <div class="data-bar" style="animation-delay: 0.3s"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: Xiaomi 17 Ultra -->
+        <section class="slide" data-index="2">
+            <div class="content-grid">
+                <div class="text-section">
+                    <span class="brand-tag">Xiaomi</span>
+                    <h1>17 Ultra</h1>
+                    <h2>Новая Эра Leica</h2>
+                    <div class="specs-grid">
+                        <div class="spec-card">
+                            <span class="spec-label">Процессор</span>
+                            <div class="spec-value">Snapdragon 8 Gen 5</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Камеры</span>
+                            <div class="spec-value">Quad 200MP System</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Материал</span>
+                            <div class="spec-value">Nano-Ceramic 2.0</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Зарядка</span>
+                            <div class="spec-value">200W Wired</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="image-section">
+                    <img src="https://picsum.photos/seed/mi17ultra/400/600" alt="Xiaomi 17 Ultra" class="phone-mockup">
+                    <div class="tech-decoration">
+                        <div class="data-bar" style="animation-delay: 0.4s"></div>
+                        <div class="data-bar" style="animation-delay: 0.2s"></div>
+                        <div class="data-bar" style="animation-delay: 0.6s"></div>
+                        <div class="data-bar" style="animation-delay: 0.1s"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: iPhone 17 Ultra -->
+        <section class="slide" data-index="3">
+            <div class="content-grid">
+                <div class="text-section">
+                    <span class="brand-tag">Apple</span>
+                    <h1>iPhone 17 Ultra</h1>
+                    <h2>Титановый Пик</h2>
+                    <div class="specs-grid">
+                        <div class="spec-card">
+                            <span class="spec-label">Чип</span>
+                            <div class="spec-value">A19 Pro Neural</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Камера</span>
+                            <div class="spec-value">48MP Variable Aperture</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Экран</span>
+                            <div class="spec-value">120Hz ProMotion XDR</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">ОС</span>
+                            <div class="spec-value">iOS 19 AI</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="image-section">
+                    <img src="https://picsum.photos/seed/iphone17/400/600" alt="iPhone 17 Ultra" class="phone-mockup">
+                    <div class="tech-decoration">
+                        <div class="data-bar" style="animation-delay: 0.1s"></div>
+                        <div class="data-bar" style="animation-delay: 0.5s"></div>
+                        <div class="data-bar" style="animation-delay: 0.2s"></div>
+                        <div class="data-bar" style="animation-delay: 0.4s"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: Huawei Pura 90 Ultra -->
+        <section class="slide" data-index="4">
+            <div class="content-grid">
+                <div class="text-section">
+                    <span class="brand-tag">Huawei</span>
+                    <h1>Pura 90 Ultra</h1>
+                    <h2>Трендовый Дизайн</h2>
+                    <div class="specs-grid">
+                        <div class="spec-card">
+                            <span class="spec-label">Фото</span>
+                            <div class="spec-value">Retractable Lens 1"</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Чип</span>
+                            <div class="spec-value">Kirin 9100S</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Связь</span>
+                            <div class="spec-value">Satellite Call</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Стекло</span>
+                            <div class="spec-value">Kunlun Glass 3</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="image-section">
+                    <img src="https://picsum.photos/seed/pura90/400/600" alt="Huawei Pura 90 Ultra" class="phone-mockup">
+                    <div class="tech-decoration">
+                        <div class="data-bar" style="animation-delay: 0.3s"></div>
+                        <div class="data-bar" style="animation-delay: 0.1s"></div>
+                        <div class="data-bar" style="animation-delay: 0.6s"></div>
+                        <div class="data-bar" style="animation-delay: 0.2s"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 6: Samsung S26 Ultra -->
+        <section class="slide" data-index="5">
+            <div class="content-grid">
+                <div class="text-section">
+                    <span class="brand-tag">Samsung</span>
+                    <h1>Galaxy S26 Ultra</h1>
+                    <h2>Король Android</h2>
+                    <div class="specs-grid">
+                        <div class="spec-card">
+                            <span class="spec-label">Процессор</span>
+                            <div class="spec-value">Exynos 2600 / SD 8 Gen 5</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Экран</span>
+                            <div class="spec-value">AMOLED 2X Dynamic</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">S Pen</span>
+                            <div class="spec-value">AI Integrated Stylus</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Зум</span>
+                            <div class="spec-value">200MP 5x Optical</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="image-section">
+                    <img src="https://picsum.photos/seed/s26ultra/400/600" alt="Samsung S26 Ultra" class="phone-mockup">
+                    <div class="tech-decoration">
+                        <div class="data-bar" style="animation-delay: 0.2s"></div>
+                        <div class="data-bar" style="animation-delay: 0.4s"></div>
+                        <div class="data-bar" style="animation-delay: 0.1s"></div>
+                        <div class="data-bar" style="animation-delay: 0.5s"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: Oppo Find X8 Pro -->
+        <section class="slide" data-index="6">
+            <div class="content-grid">
+                <div class="text-section">
+                    <span class="brand-tag">Oppo</span>
+                    <h1>Find X8 Pro</h1>
+                    <h2>Мастер Портретов</h2>
+                    <div class="specs-grid">
+                        <div class="spec-card">
+                            <span class="spec-label">Перископы</span>
+                            <div class="spec-value">Dual 3x & 6x Optical</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Дизайн</span>
+                            <div class="spec-value">Quad Micro-Curve</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Чип</span>
+                            <div class="spec-value">Dimensity 9500</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Зарядка</span>
+                            <div class="spec-value">100W + 50W Wireless</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="image-section">
+                    <img src="https://picsum.photos/seed/oppofind/400/600" alt="Oppo Find X8 Pro" class="phone-mockup">
+                    <div class="tech-decoration">
+                        <div class="data-bar" style="animation-delay: 0.5s"></div>
+                        <div class="data-bar" style="animation-delay: 0.2s"></div>
+                        <div class="data-bar" style="animation-delay: 0.3s"></div>
+                        <div class="data-bar" style="animation-delay: 0.1s"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8: Oneplus 14 Pro -->
+        <section class="slide" data-index="7">
+            <div class="content-grid">
+                <div class="text-section">
+                    <span class="brand-tag">OnePlus</span>
+                    <h1>14 Pro</h1>
+                    <h2>Мощь Производительности</h2>
+                    <div class="specs-grid">
+                        <div class="spec-card">
+                            <span class="spec-label">Экран</span>
+                            <div class="spec-value">2K Oriental Display 2.0</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Материал</span>
+                            <div class="spec-value">Vegan Leather / Ceramic</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Система</span>
+                            <div class="spec-value">OxygenOS 15</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Вибрация</span>
+                            <div class="spec-value">Motor Turbo</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="image-section">
+                    <img src="https://picsum.photos/seed/oneplus14/400/600" alt="Oneplus 14 Pro" class="phone-mockup">
+                    <div class="tech-decoration">
+                        <div class="data-bar" style="animation-delay: 0.1s"></div>
+                        <div class="data-bar" style="animation-delay: 0.3s"></div>
+                        <div class="data-bar" style="animation-delay: 0.6s"></div>
+                        <div class="data-bar" style="animation-delay: 0.2s"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 9: Honor Magic 8 Pro -->
+        <section class="slide" data-index="8">
+            <div class="content-grid">
+                <div class="text-section">
+                    <span class="brand-tag">Honor</span>
+                    <h1>Magic 8 Pro</h1>
+                    <h2>Орлиный Глаз</h2>
+                    <div class="specs-grid">
+                        <div class="spec-card">
+                            <span class="spec-label">Защита глаз</span>
+                            <div class="spec-value">4320Hz PWM Dimming</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Связь</span>
+                            <div class="spec-value">C1+ RF Chip</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Батарея</span>
+                            <div class="spec-value">Qinghai Lake Battery</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">ИИ</span>
+                            <div class="spec-value">MagicOS 9.0</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="image-section">
+                    <img src="https://picsum.photos/seed/honormagic/400/600" alt="Honor Magic 8 Pro" class="phone-mockup">
+                    <div class="tech-decoration">
+                        <div class="data-bar" style="animation-delay: 0.4s"></div>
+                        <div class="data-bar" style="animation-delay: 0.1s"></div>
+                        <div class="data-bar" style="animation-delay: 0.5s"></div>
+                        <div class="data-bar" style="animation-delay: 0.2s"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 10: Google Pixel 11 Pro -->
+        <section class="slide" data-index="9">
+            <div class="content-grid">
+                <div class="text-section">
+                    <span class="brand-tag">Google</span>
+                    <h1>Pixel 11 Pro</h1>
+                    <h2>Король AI Фотографии</h2>
+                    <div class="specs-grid">
+                        <div class="spec-card">
+                            <span class="spec-label">AI</span>
+                            <div class="spec-value">Gemini Nano Local</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Фото</span>
+                            <div class="spec-value">Computational Photo 3.0</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">ОС</span>
+                            <div class="spec-value">Android 16</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Чип</span>
+                            <div class="spec-value">Tensor G5</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="image-section">
+                    <img src="https://picsum.photos/seed/pixel11/400/600" alt="Google Pixel 11 Pro" class="phone-mockup">
+                    <div class="tech-decoration">
+                        <div class="data-bar" style="animation-delay: 0.2s"></div>
+                        <div class="data-bar" style="animation-delay: 0.5s"></div>
+                        <div class="data-bar" style="animation-delay: 0.1s"></div>
+                        <div class="data-bar" style="animation-delay: 0.4s"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 11: Redmi K80 Pro -->
+        <section class="slide" data-index="10">
+            <div class="content-grid">
+                <div class="text-section">
+                    <span class="brand-tag">Redmi</span>
+                    <h1>K80 Pro</h1>
+                    <h2>Флагманская Цена</h2>
+                    <div class="specs-grid">
+                        <div class="spec-card">
+                            <span class="spec-label">Экран</span>
+                            <div class="spec-value">2K C9+ Material</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Батарея</span>
+                            <div class="spec-value">6500mAh Massive</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Чип</span>
+                            <div class="spec-value">Snapdragon 8 Gen 5</div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-label">Цена</span>
+                            <div class="spec-value">Flagship Killer</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="image-section">
+                    <img src="https://picsum.photos/seed/redmik80/400/600" alt="Redmi K80 Pro" class="phone-mockup">
+                    <div class="tech-decoration">
+                        <div class="data-bar" style="animation-delay: 0.3s"></div>
+                        <div class="data-bar" style="animation-delay: 0.1s"></div>
+                        <div class="data-bar" style="animation-delay: 0.6s"></div>
+                        <div class="data-bar" style="animation-delay: 0.2s"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 12: Outro -->
+        <section class="slide" data-index="11">
+            <div class="content-grid" style="text-align: center;">
+                <div style="grid-column: 1 / -1;">
+                    <span class="brand-tag">2026</span>
+                    <h1>Будущее Уже Здесь</h1>
+                    <h2>Спасибо за просмотр</h2>
+                    <p style="color: #aaa; margin: 20px auto; max-width: 600px;">
+                        Технологии не стоят на месте. Инновации продолжаются.
+                    </p>
+                    <button onclick="document.querySelector('.slide[data-index=\"0\"]').scrollIntoView({behavior: 'smooth'})" 
+                            style="margin-top: 30px; padding: 15px 40px; background: #ff9d00; border: none; border-radius: 30px; color: #000; font-weight: bold; font-size: 1rem; cursor: pointer; transition: transform 0.2s;">
+                        В начало
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- 1. 粒子背景动画逻辑 ---
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray;
+
+        // 设置 Canvas 尺寸
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // 鼠标交互对象
+        let mouse = {
+            x: null,
+            y: null,
+            radius: (canvas.height/80) * (canvas.width/80)
+        }
+
+        window.addEventListener('mousemove', (event) => {
+            mouse.x = event.x;
+            mouse.y = event.y;
+        });
+
+        // 粒子类
+        class Particle {
+            constructor(x, y, directionX, directionY, size, color) {
+                this.x = x;
+                this.y = y;
+                this.directionX = directionX;
+                this.directionY = directionY;
+                this.size = size;
+                this.color = color;
+            }
+
+            // 绘制粒子
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = '#ff9d00';
+                ctx.fill();
+            }
+
+            // 更新粒子位置
+            update() {
+                // 边界检测
+                if (this.x > canvas.width || this.x < 0) {
+                    this.directionX = -this.directionX;
+                }
+                if (this.y > canvas.height || this.y < 0) {
+                    this.directionY = -this.directionY;
+                }
+
+                // 鼠标碰撞检测
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx*dx + dy*dy);
+                if (distance < mouse.radius + this.size){
+                    if (mouse.x < this.x && this.x < canvas.width - this.size * 10) {
+                        this.x += 10;
+                    }
+                    if (mouse.x > this.x && this.x > this.size * 10) {
+                        this.x -= 10;
+                    }
+                    if (mouse.y < this.y && this.y < canvas.height - this.size * 10) {
+                        this.y += 10;
+                    }
+                    if (mouse.y > this.y && this.y > this.size * 10) {
+                        this.y -= 10;
+                    }
+                }
+
+                this.x += this.directionX;
+                this.y += this.directionY;
+                this.draw();
+            }
+        }
+
+        // 初始化粒子
+        function init() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 9000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                let size = (Math.random() * 2) + 1;
+                let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                let directionX = (Math.random() * 0.4) - 0.2;
+                let directionY = (Math.random() * 0.4) - 0.2;
+                let color = '#ff9d00';
+
+                particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+            }
+        }
+
+        // 连线动画
+        function connect() {
+            let opacityValue = 1;
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) + 
+                                   ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+                    if (distance < (canvas.width/7) * (canvas.height/7)) {
+                        opacityValue = 1 - (distance/20000);
+                        ctx.strokeStyle = 'rgba(255, 157, 0,' + opacityValue * 0.2 + ')'; // 橙色连线
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        // 动画循环
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.clearRect(0,0,innerWidth, innerHeight);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+            }
+            connect();
+        }
+
+        // 窗口大小改变时重置
+        window.addEventListener('resize', () => {
+            canvas.width = innerWidth;
+            canvas.height = innerHeight;
+            mouse.radius = ((canvas.height/80) * (canvas.height/80));
+            init();
+        });
+
+        // 鼠标移出窗口清除位置
+        window.addEventListener('mouseout', () => {
+            mouse.x = undefined;
+            mouse.y = undefined;
+        })
+
+        init();
+        animate();
+
+
+        // --- 2. 滑动与分页逻辑 ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const slider = document.getElementById('slider');
+            const slides = document.querySelectorAll('.slide');
+            const pagination = document.getElementById('pagination');
+            const totalSlides = slides.length;
+
+            // 生成分页点
+            slides.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                if (index === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => {
+                    slides[index].scrollIntoView({ behavior: 'smooth' });
+                });
+                pagination.appendChild(dot);
+            });
+
+            const dots = document.querySelectorAll('.dot');
+
+            const observerOptions = {
+                root: slider,
+                threshold: 0.5
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        slides.forEach(s => s.classList.remove('active'));
+                        dots.forEach(d => d.classList.remove('active'));
+
+                        const index = parseInt(entry.target.getAttribute('data-index'));
+                        entry.target.classList.add('active');
+                        if(dots[index]) dots[index].classList.add('active');
+                    }
+                });
+            }, observerOptions);
+
+            slides.forEach(slide => {
+                observer.observe(slide);
+            });
+        });
+    </script>
+</body>
+</html>
